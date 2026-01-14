@@ -446,5 +446,61 @@
         "source": "ACM Digital Library",
         "journal": "ACM",
         "abstract_": "N/A"
+    },
+    {
+        "title": "Machine Learning for Blockchain Data Analysis: Progress and Opportunities",
+        "authors": "Poupak Azad, Cuneyt Gurcan Akcora, Arijit Khan",
+        "date_pub": "2025",
+        "source": "ACM Digital Library",
+        "journal": "ACM",
+        "abstract_": "N/A"
+    },
+    {
+        "title": "Cross-Blockchain Communication Using Oracles With an Off-Chain Aggregation Mechanism Based on zk-SNARKs",
+        "authors": "Michael Sober, Giulia Scaffino, Stefan Schulte",
+        "date_pub": "2024",
+        "source": "ACM Digital Library",
+        "journal": "ACM",
+        "abstract_": "N/A"
+    },
+    {
+        "title": "Efficient DoS Attack Defense Strategy for Blockchain Networks Based on Bayesian Attack Graph and Stackelberg Game",
+        "authors": "Tianyi Wang, Wei Tang, Chengyi Dong, Entang Li, Zhou Su, Jiliang Li",
+        "date_pub": "2025",
+        "source": "ACM Digital Library",
+        "journal": "ACM",
+        "abstract_": "N/A"
+    },
+    {
+        "title": "Security Architectural Approaches and Risk Assessment Methods for Blockchain Systems: A Review and Future Directions",
+        "authors": "Sabreen Ahmadjee, Carlos Mera-Gómez, Rami Bahsoon, Rajkumar Buyya",
+        "date_pub": "2025",
+        "source": "ACM Digital Library",
+        "journal": "ACM",
+        "abstract_": "N/A"
+    },
+    {
+        "title": "BlockGuardian: Intelligent Multi-Dimensional Blockchain Code Analysis Framework",
+        "authors": "Ruohan Gao, Qiao Wu",
+        "date_pub": "2025",
+        "source": "ACM Digital Library",
+        "journal": "ACM",
+        "abstract_": "N/A"
+    },
+    {
+        "title": "Blockchain-Based Decentralized Domain Name System",
+        "authors": "Guang Yang, Peter Trinh, Amuru Serikyaku, Alma Nkemla, Edward Tatchim, + 1",
+        "date_pub": "2025",
+        "source": "ACM Digital Library",
+        "journal": "ACM",
+        "abstract_": "N/A"
+    },
+    {
+        "title": "BlockNetSys '25: Proceedings of the 2025 ACM CoNEXT Workshop on Blockchain-Network Synergy",
+        "authors": "Huawei Huang, Dusit Niyato, Yi Sun, Hironori Washizaki",
+        "date_pub": "2025",
+        "source": "ACM Digital Library",
+        "journal": "ACM",
+        "abstract_": "N/A"
     }
 ]
