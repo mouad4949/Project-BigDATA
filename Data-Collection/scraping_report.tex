@@ -1,0 +1,338 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{enumitem}
+
+% Code listing style
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{red},
+    showstringspaces=false
+}
+
+\title{\textbf{Blockchain Literature Web Scraping Project}\\
+\Large Data Collection from Multiple Academic Sources}
+\author{Mouad Rguibi}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This report presents a comprehensive web scraping project designed to collect academic literature on blockchain technology from three major digital libraries: IEEE Xplore, ScienceDirect, and ACM Digital Library. Using Python's Scrapy framework and MongoDB for data persistence, the system successfully extracted 277 scholarly articles containing metadata including titles, authors, publication dates, and abstracts. The automated pipeline demonstrates an efficient approach to academic data collection for big data analytics and literature review purposes.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\subsection{Project Overview}
+The exponential growth of blockchain research across various domains necessitates systematic approaches to literature collection and analysis. This project implements an automated web scraping system to aggregate blockchain-related academic publications from multiple reputable sources.
+
+\subsection{Objectives}
+The primary objectives of this project include:
+\begin{itemize}[itemsep=0.5em]
+    \item Develop a scalable web scraping infrastructure using Scrapy
+    \item Extract structured metadata from IEEE Xplore, ScienceDirect, and ACM Digital Library
+    \item Store collected data in MongoDB for efficient querying and analysis
+    \item Generate a consolidated JSON dataset for downstream processing
+    \item Enable automated execution across multiple academic sources
+\end{itemize}
+
+\subsection{Scope}
+The scraping system targets articles matching the keyword ``Blockchain'' with a configurable page limit of 4 pages per source. The collected metadata includes article titles, authors, publication dates, source information, journal names, and abstracts.
+
+\section{Methodology}
+
+\subsection{Technology Stack}
+The project leverages the following technologies:
+\begin{itemize}
+    \item \textbf{Scrapy}: Python web scraping framework for data extraction
+    \item \textbf{MongoDB}: NoSQL database for storing scraped articles
+    \item \textbf{PyMongo}: Python driver for MongoDB integration
+    \item \textbf{Python 3}: Core programming language for automation
+\end{itemize}
+
+\subsection{System Architecture}
+The system consists of three main components:
+
+\begin{enumerate}
+    \item \textbf{Scrapy Spiders}: Independent spider modules for each data source (IEEE, ScienceDirect, ACM)
+    \item \textbf{Data Pipeline}: MongoDB pipeline for data validation and storage
+    \item \textbf{Orchestration Script}: Central controller (\texttt{run\_all.py}) managing sequential execution
+\end{enumerate}
+
+\subsection{Data Sources}
+
+\subsubsection{IEEE Xplore}
+IEEE Xplore Digital Library provides access to technical literature in electrical engineering, computer science, and electronics. The spider extracts metadata from search results matching blockchain-related queries.
+
+\subsubsection{ScienceDirect}
+ScienceDirect, Elsevier's platform, offers extensive scientific, technical, and medical research. The scraper targets blockchain publications across multiple disciplines.
+
+\subsubsection{ACM Digital Library}
+The ACM Digital Library contains computing and information technology literature. The spider focuses on blockchain research within computer science domains.
+
+\subsection{Scraping Process}
+
+The automated scraping process follows these steps:
+
+\begin{enumerate}[itemsep=0.5em]
+    \item \textbf{Initialization}: Configuration of search parameters (keyword: ``Blockchain'', pages: 4)
+    \item \textbf{Sequential Execution}: Each spider runs independently with 5-second cooldown periods
+    \item \textbf{Data Extraction}: HTML parsing to extract structured metadata
+    \item \textbf{Storage}: Real-time data insertion into MongoDB
+    \item \textbf{Export}: Final consolidation into JSON format
+\end{enumerate}
+
+\subsection{Code Implementation}
+
+The main orchestration script coordinates the entire scraping pipeline:
+
+\begin{lstlisting}[language=Python, caption={Main Orchestration Script (run\_all.py)}]
+import subprocess
+import os
+import json
+import pymongo
+import time
+
+KEYWORD = "Blockchain"
+PAGE_LIMITS = {
+    "iee": 4,
+    "sd": 4,
+    "acm": 4
+}
+
+PROJECTS = [
+    ("IEE", "iee"),
+    ("SCIENCE_DIRECT", "sd"),
+    ("ACM", "acm")
+]
+
+def run_spider(folder, spider_name):
+    pages = PAGE_LIMITS.get(spider_name, 1)
+    cmd = [
+        "scrapy", "crawl", spider_name,
+        "-a", f"keywords={KEYWORD}",
+        "-a", f"pages={pages}"
+    ]
+    subprocess.run(cmd, cwd=project_path, check=True)
+
+def export_final_json():
+    client = pymongo.MongoClient("mongodb://localhost:27017/")
+    db = client["aci"]
+    collection = db["articles"]
+    cursor = collection.find({}, {"_id": 0})
+    articles = list(cursor)
+    
+    with open("final_data.json", 'w') as f:
+        json.dump(articles, f, indent=4)
+\end{lstlisting}
+
+\section{Results}
+
+\subsection{Data Collection Summary}
+
+The scraping operation successfully collected a total of \textbf{277 academic articles} on blockchain technology. Table~\ref{tab:sources} presents the distribution across data sources.
+
+\begin{table}[H]
+\centering
+\caption{Article Distribution by Source}
+\label{tab:sources}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Source} & \textbf{Articles Collected} & \textbf{Percentage} \\
+\midrule
+ScienceDirect & 116 & 41.9\% \\
+IEEE Xplore & 98 & 35.4\% \\
+ACM Digital Library & 63 & 22.7\% \\
+\midrule
+\textbf{Total} & \textbf{277} & \textbf{100\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Temporal Distribution}
+
+The collected articles span multiple years, with notable concentration in recent publications (2025-2026). Table~\ref{tab:years} shows the temporal distribution.
+
+\begin{table}[H]
+\centering
+\caption{Article Distribution by Publication Year}
+\label{tab:years}
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Year} & \textbf{Count} \\
+\midrule
+2026 & 70 \\
+2025 & 108 \\
+2024 & 23 \\
+2023 & 8 \\
+2022 & 12 \\
+2021 & 21 \\
+2020 & 6 \\
+2019 & 23 \\
+2018 & 4 \\
+Unknown & 2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Data Structure}
+
+Each collected article contains the following fields:
+
+\begin{itemize}
+    \item \textbf{title}: Full article title
+    \item \textbf{authors}: Semicolon-separated list of authors
+    \item \textbf{date\_pub}: Publication year
+    \item \textbf{source}: Digital library source (IEEE Xplore, ScienceDirect, ACM Digital Library)
+    \item \textbf{journal}: Publisher/journal name
+    \item \textbf{abstract\_}: Article abstract (where available)
+\end{itemize}
+
+\subsection{Sample Data Entry}
+
+\begin{lstlisting}[language=JSON, caption={Example Article Entry}]
+{
+    "title": "ArtChain: Blockchain-Enabled Platform 
+             for Art Marketplace",
+    "authors": "Ziyuan Wang; Lin Yang; Qin Wang; 
+                Donghai Liu; Zhiyu Xu; Shigang Liu",
+    "date_pub": "2019",
+    "source": "IEEE Xplore",
+    "journal": "IEEE",
+    "abstract_": "N/A"
+}
+\end{lstlisting}
+
+\section{Analysis and Insights}
+
+\subsection{Source Performance}
+\begin{itemize}
+    \item \textbf{ScienceDirect} yielded the highest number of articles (116), indicating strong blockchain research coverage in multidisciplinary journals.
+    \item \textbf{IEEE Xplore} contributed 98 articles, reflecting substantial technical and engineering-focused blockchain research.
+    \item \textbf{ACM Digital Library} provided 63 articles, concentrated on computer science perspectives.
+\end{itemize}
+
+\subsection{Temporal Trends}
+The data reveals a significant surge in blockchain publications in 2025 and 2026, with 178 articles (64.3\% of total). This indicates:
+\begin{itemize}
+    \item Increasing academic interest in blockchain technology
+    \item Maturation of blockchain research domains
+    \item Expanding application areas beyond cryptocurrency
+\end{itemize}
+
+\subsection{Data Quality Observations}
+Several quality considerations were noted:
+\begin{itemize}
+    \item Many abstracts were not available (marked as ``N/A'')
+    \item Some entries list ``Unknown'' as author (likely standards documents)
+    \item Author names contain semicolon separators requiring post-processing
+    \item Two entries have unknown publication dates
+\end{itemize}
+
+\section{Technical Challenges}
+
+\subsection{Website Structure Variability}
+Each academic platform employs different HTML structures and CSS selectors, requiring custom parsing logic for each spider.
+
+\subsection{Rate Limiting and Blocking}
+To avoid IP blocking, the system implements:
+\begin{itemize}
+    \item Sequential spider execution (not parallel)
+    \item 5-second cooldown periods between sources
+    \item Configurable page limits to reduce server load
+\end{itemize}
+
+\subsection{Data Consistency}
+Variations in metadata availability across sources necessitated flexible data models accepting ``N/A'' or ``Unknown'' values.
+
+\section{Future Enhancements}
+
+\subsection{Short-term Improvements}
+\begin{enumerate}
+    \item Implement retry mechanisms for failed requests
+    \item Add abstract availability checking and alternative extraction methods
+    \item Enhance author name parsing and normalization
+    \item Include DOI and citation information
+\end{enumerate}
+
+\subsection{Long-term Extensions}
+\begin{enumerate}
+    \item Expand to additional academic sources (Springer, Wiley, Google Scholar)
+    \item Implement full-text PDF download capabilities
+    \item Add natural language processing for abstract analysis
+    \item Develop automated citation network mapping
+    \item Create interactive dashboard for data exploration
+\end{enumerate}
+
+\subsection{Data Analytics Applications}
+The collected dataset enables:
+\begin{itemize}
+    \item Bibliometric analysis of blockchain research trends
+    \item Author collaboration network analysis
+    \item Topic modeling and research theme identification
+    \item Citation analysis and impact assessment
+    \item Temporal evolution studies of blockchain applications
+\end{itemize}
+
+\section{Conclusion}
+
+This project successfully demonstrates a scalable approach to automated academic literature collection using Python's Scrapy framework. The system collected 277 blockchain-related articles from three major digital libraries, providing a structured dataset for big data analytics and research.
+
+Key achievements include:
+\begin{itemize}
+    \item Automated multi-source data extraction pipeline
+    \item MongoDB integration for efficient data management
+    \item JSON export for interoperability with analysis tools
+    \item Configurable parameters for flexible deployment
+\end{itemize}
+
+The resulting dataset provides a foundation for comprehensive blockchain literature analysis, trend identification, and research gap discovery. The modular architecture facilitates easy extension to additional data sources and metadata fields.
+
+\section{Project Files}
+
+The project directory structure:
+
+\begin{verbatim}
+Data-Collection/
+├── ACM/
+│   ├── acm/                    # Scrapy project
+│   ├── acm_results.json        # ACM raw data
+│   └── scrapy.cfg
+├── IEE/
+│   ├── iee/                    # Scrapy project
+│   ├── ieee_results.json       # IEEE raw data
+│   └── scrapy.cfg
+├── SCIENCE_DIRECT/
+│   ├── sciencedirect/          # Scrapy project
+│   └── scrapy.cfg
+├── run_all.py                  # Main orchestration script
+├── clearing_database.py        # Database cleanup utility
+├── final_data.json             # Consolidated dataset (277 articles)
+└── analyze_data.py             # Data analysis script
+\end{verbatim}
+
+\section*{Acknowledgments}
+
+This project was developed as part of a Big Data course project, demonstrating practical applications of web scraping, NoSQL databases, and data pipeline automation.
+
+\end{document}

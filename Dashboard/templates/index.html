@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Research Dashboard - Advanced Analytics</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --sidebar-bg: #1a1d29;
+            --card-shadow: 0 4px 6px rgba(0,0,0,.1), 0 1px 3px rgba(0,0,0,.08);
+            --card-hover-shadow: 0 10px 20px rgba(0,0,0,.15), 0 3px 6px rgba(0,0,0,.1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Animated Gradient Background */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Modern Navbar */
+        .navbar {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 1.2rem 0;
+        }
+        
+        .brand-logo {
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+        }
+        
+        .brand-logo i {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Enhanced KPI Cards */
+        .kpi-card {
+            border-radius: 16px;
+            position: relative;
+            display: block;
+            margin-bottom: 25px;
+            padding: 30px;
+            color: #fff;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--card-shadow);
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--card-hover-shadow);
+        }
+        
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255,255,255,0.1);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+        }
+        
+        .kpi-card:hover::before {
+            top: -100%;
+            right: -100%;
+        }
+        
+        .kpi-card .inner h3 { 
+            font-size: 2.8rem; 
+            font-weight: 800; 
+            margin: 0 0 15px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .kpi-card .inner p { 
+            font-size: 1.1rem; 
+            font-weight: 500;
+            opacity: 0.95;
+        }
+        
+        .kpi-card .icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 80px;
+            opacity: 0.2;
+            transition: all 0.3s;
+        }
+        
+        .kpi-card:hover .icon {
+            opacity: 0.3;
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .kpi-1 { background: var(--info-gradient); }
+        .kpi-2 { background: var(--success-gradient); }
+        .kpi-3 { background: var(--warning-gradient); }
+        .kpi-4 { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); }
+
+        /* Modern Cards */
+        .dashboard-card {
+            border: none;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+        
+        .dashboard-card:hover {
+            box-shadow: var(--card-hover-shadow);
+            transform: translateY(-4px);
+        }
+        
+        .card-header-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 20px 25px;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-header-custom i {
+            font-size: 1.3rem;
+        }
+        
+        .card-body-custom {
+            padding: 25px;
+        }
+
+        /* Loading Animation */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .loader-content {
+            text-align: center;
+            color: white;
+        }
+        
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loader-text {
+            margin-top: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 30px;
+            color: white;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .search-input {
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .search-btn {
+            border-radius: 50px;
+            padding: 15px 35px;
+            font-weight: 600;
+            background: #fff;
+            color: #667eea;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .search-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Table Styling */
+        .results-table {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .results-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .results-table tbody tr {
+            transition: all 0.2s;
+        }
+        
+        .results-table tbody tr:hover {
+            background-color: #f8f9ff;
+            transform: scale(1.01);
+        }
+
+        /* Chart Container Improvements */
+        canvas {
+            max-height: 400px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .kpi-card .inner h3 { font-size: 2rem; }
+            .brand-logo { font-size: 1.4rem; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 5px;
+        }
+
+        /* Fade-in Animation */
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">CHARGEMENT DES DONNÉES...</div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand brand-logo" href="#">
+                <i class="fas fa-microscope me-2"></i> SCIENTIFIC RESEARCH BI
+            </a>
+            <span class="navbar-text text-white fw-bold">
+                <i class="fas fa-database me-2"></i> Big Data Analytics Dashboard
+            </span>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4 py-4">
+        
+        <!-- KPI Section -->
+        <div class="row fade-in">
+            <div class="col-lg-3 col-md-6">
+                <div class="kpi-card kpi-1">
+                    <div class="inner">
+                        <h3 id="kpi-total">-</h3>
+                        <p>Total Publications</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-copy"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="kpi-card kpi-2">
+                    <div class="inner">
+                        <h3 id="kpi-sources">-</h3>
+                        <p>Sources Distinctes</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-database"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="kpi-card kpi-3">
+                    <div class="inner">
+                        <h3 id="kpi-journals">-</h3>
+                        <p>Journaux & Conférences</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-book"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="kpi-card kpi-4">
+                    <div class="inner">
+                        <h3 id="kpi-years">-</h3>
+                        <p>Plage Temporelle</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-calendar-alt"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 1: Trend + Quartiles -->
+        <div class="row fade-in">
+            <div class="col-lg-8">
+                <div class="dashboard-card">
+                    <div class="card-header-custom">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Évolution Temporelle de la Production Scientifique</span>
+                    </div>
+                    <div class="card-body-custom">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="dashboard-card">
+                    <div class="card-header-custom" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Qualité Scientifique (Quartiles)</span>
+                    </div>
+                    <div class="card-body-custom">
+                        <canvas id="quartileChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- World Map -->
+        <div class="row fade-in">
+            <div class="col-12">
+                <div class="dashboard-card">
+                    <div class="card-header-custom" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-globe-americas"></i>
+                        <span>Distribution Géographique Mondiale de la Production</span>
+                    </div>
+                    <div class="card-body-custom">
+                        <div id="worldMapContainer" style="height: 550px; width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 2: Authors + Journals -->
+        <div class="row fade-in">
+            <div class="col-lg-6">
+                <div class="dashboard-card">
+                    <div class="card-header-custom" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <i class="fas fa-user-graduate"></i>
+                        <span>Top 15 Auteurs les Plus Productifs</span>
+                    </div>
+                    <div class="card-body-custom">
+                        <canvas id="authorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="dashboard-card">
+                    <div class="card-header-custom" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                        <i class="fas fa-newspaper"></i>
+                        <span>Top 10 Journaux / Conférences</span>
+                    </div>
+                    <div class="card-body-custom">
+                        <canvas id="journalChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keywords Word Cloud -->
+        <div class="row fade-in">
+            <div class="col-12">
+                <div class="dashboard-card">
+                    <div class="card-header-custom" style="background: linear-gradient(135deg, #0c0b0a 0%, #fcb69f 100%);">
+                        <i class="fas fa-cloud"></i>
+                        <span>Nuage de Mots-Clés & Thématiques de Recherche</span>
+                    </div>
+                    <div class="card-body-custom text-center">
+                        <div id="wordCloudContainer" style="min-height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="row fade-in mb-5">
+            <div class="col-12">
+                <div class="search-section">
+                    <h3 class="mb-4">
+                        <i class="fas fa-search me-2"></i>
+                        Moteur de Recherche dans le Data Lake
+                    </h3>
+                    <div class="input-group mb-4">
+                        <input type="text" id="searchInput" class="form-control search-input" 
+                               placeholder="Rechercher par titre, auteur ou mot-clé...">
+                        <button class="btn search-btn" type="button" onclick="searchArticles()">
+                            <i class="fas fa-search me-2"></i>RECHERCHER
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover results-table" id="resultsTable">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-file-alt me-2"></i>Titre</th>
+                                    <th><i class="fas fa-users me-2"></i>Auteurs</th>
+                                    <th><i class="fas fa-calendar me-2"></i>Année</th>
+                                    <th><i class="fas fa-bookmark me-2"></i>Source</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4" class="text-center text-white-50">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Utilisez la barre de recherche pour explorer les données...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.highcharts.com/maps/highmaps.js"></script>
+    <script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/mapdata/custom/world.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"></script>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:5000/api';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initDashboard();
+        });
+
+        async function initDashboard() {
+            try {
+                await loadKPIs();
+                await loadTrendsChart();
+                await loadQuartilesChart();
+                await loadWorldMap();
+                await loadAuthorsChart();
+                await loadJournalsChart();
+                await loadWordCloud();
+            } catch (error) {
+                console.error("❌ Erreur d'initialisation:", error);
+                alert("Erreur de connexion à l'API Flask. Vérifiez que app.py est en cours d'exécution.");
+            } finally {
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = 'none';
+                }, 800);
+            }
+        }
+
+        // --- 1. KPIs ---
+        async function loadKPIs() {
+            const res = await fetch(`${API_URL}/stats/overview`);
+            const data = await res.json();
+            const stats = data.statistics;
+            
+            animateValue('kpi-total', 0, stats.total_articles, 1000);
+            animateValue('kpi-sources', 0, stats.total_sources, 1000);
+            animateValue('kpi-journals', 0, stats.total_journals, 1000);
+            document.getElementById('kpi-years').innerText = `${stats.year_range.min} - ${stats.year_range.max}`;
+        }
+
+        function animateValue(id, start, end, duration) {
+            const element = document.getElementById(id);
+            const range = end - start;
+            const increment = range / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    element.textContent = Math.round(end);
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.round(current);
+                }
+            }, 16);
+        }
+
+        // --- 2. Trend Chart ---
+        async function loadTrendsChart() {
+            const res = await fetch(`${API_URL}/stats/by-year`);
+            const json = await res.json();
+            
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: json.data.map(d => d.year),
+                    datasets: [{
+                        label: 'Publications',
+                        data: json.data.map(d => d.count),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#fff',
+                        pointBorderWidth: 3,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            titleFont: { size: 14, weight: 'bold' },
+                            bodyFont: { size: 13 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- 3. Quartiles Chart ---
+        async function loadQuartilesChart() {
+            const res = await fetch(`${API_URL}/stats/quartiles`);
+            const json = await res.json();
+            
+            const labels = json.data.length ? json.data.map(d => d.quartile) : ['Q1', 'Q2', 'Q3', 'Q4'];
+            const data = json.data.length ? json.data.map(d => d.count) : [0, 0, 0, 0];
+
+            const ctx = document.getElementById('quartileChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(118, 75, 162, 0.8)',
+                            'rgba(240, 147, 251, 0.8)',
+                            'rgba(245, 87, 108, 0.8)'
+                        ],
+                        borderWidth: 3,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 15, font: { size: 13 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- 4. World Map (Solution qui fonctionne) ---
+        async function loadWorldMap() {
+            try {
+                console.log("🗺️ Chargement de la carte mondiale...");
+                
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (typeof Highcharts === 'undefined') {
+                    throw new Error("Highcharts n'est pas chargé!");
+                }
+
+                const res = await fetch(`${API_URL}/stats/by-country`);
+                const json = await res.json();
+
+                const countryToHCKey = {
+                    'Argentina': 'ar', 'Australia': 'au', 'Brazil': 'br', 'Canada': 'ca',
+                    'China': 'cn', 'Egypt': 'eg', 'France': 'fr', 'Germany': 'de',
+                    'India': 'in', 'Italy': 'it', 'Japan': 'jp', 'Mexico': 'mx',
+                    'Morocco': 'ma', 'Nigeria': 'ng', 'Russia': 'ru', 'South Africa': 'za',
+                    'South Korea': 'kr', 'Spain': 'es', 'USA': 'us', 'United States': 'us',
+                    'United Kingdom': 'gb', 'UK': 'gb'
+                };
+
+                const mapData = json.data.map(item => {
+                    const hcKey = countryToHCKey[item.country];
+                    if (!hcKey) console.warn(`⚠️ Pays non mappé: ${item.country}`);
+                    return [hcKey, item.count];
+                }).filter(item => item[0]);
+
+                let topology = Highcharts.maps['custom/world'];
+                
+                if (!topology) {
+                    const topoRes = await fetch('https://code.highcharts.com/mapdata/custom/world.topo.json');
+                    topology = await topoRes.json();
+                }
+
+                const chart = Highcharts.mapChart('worldMapContainer', {
+                    chart: {
+                        map: topology,
+                        backgroundColor: '#f8f9fa',
+                        height: 550,
+                        borderWidth: 1,
+                        borderColor: '#e0e0e0',
+                        borderRadius: 8
+                    },
+                    title: { text: '' },
+                    credits: { enabled: false },
+                    mapNavigation: {
+                        enabled: true,
+                        enableButtons: true,
+                        buttonOptions: {
+                            verticalAlign: 'bottom',
+                            align: 'left',
+                            theme: {
+                                fill: '#667eea',
+                                'stroke-width': 0,
+                                style: { color: '#fff' }
+                            }
+                        }
+                    },
+                    colorAxis: {
+                        min: 0,
+                        max: Math.max(...mapData.map(d => d[1])),
+                        stops: [
+                            [0, '#E3F2FD'],
+                            [0.33, '#64B5F6'],
+                            [0.66, '#1976D2'],
+                            [1, '#0D47A1']
+                        ]
+                    },
+                    legend: {
+                        enabled: true,
+                        title: { text: 'Publications', style: { fontWeight: 'bold' } }
+                    },
+                    series: [{
+                        name: 'Pays',
+                        borderColor: '#999',
+                        borderWidth: 0.5,
+                        nullColor: 'rgba(220, 220, 220, 0.4)',
+                        showInLegend: false,
+                        enableMouseTracking: false
+                    }, {
+                        type: 'map',
+                        name: 'Publications',
+                        data: mapData,
+                        joinBy: ['hc-key', 0],
+                        borderColor: '#333',
+                        borderWidth: 1.5,
+                        states: {
+                            hover: {
+                                color: '#FFD700',
+                                borderColor: '#FF5722',
+                                borderWidth: 2.5
+                            }
+                        },
+                        tooltip: {
+                            headerFormat: '',
+                            pointFormat: '<b>{point.name}</b><br/>Publications: <b>{point.value}</b>'
+                        }
+                    }]
+                });
+
+                setTimeout(() => chart?.reflow?.(), 500);
+
+            } catch (error) {
+                console.error("❌ Erreur carte:", error);
+                document.getElementById('worldMapContainer').innerHTML = 
+                    `<div class="alert alert-danger m-3"><i class="fas fa-exclamation-triangle"></i> ${error.message}</div>`;
+            }
+        }
+
+        // --- 5. Authors Chart ---
+        async function loadAuthorsChart() {
+            const res = await fetch(`${API_URL}/stats/top-authors`);
+            const json = await res.json();
+            
+            const ctx = document.getElementById('authorChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                indexAxis: 'y',
+                data: {
+                    labels: json.data.map(d => d.author),
+                    datasets: [{
+                        label: 'Publications',
+                        data: json.data.map(d => d.count),
+                        backgroundColor: 'rgba(250, 112, 154, 0.8)',
+                        borderColor: 'rgba(250, 112, 154, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // --- 6. Journals Chart ---
+        async function loadJournalsChart() {
+            const res = await fetch(`${API_URL}/stats/by-journal`);
+            const json = await res.json();
+            
+            const ctx = document.getElementById('journalChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: json.data.map(d => d.journal.length > 25 ? d.journal.substring(0, 25) + '...' : d.journal),
+                    datasets: [{
+                        label: 'Publications',
+                        data: json.data.map(d => d.count),
+                        backgroundColor: 'rgba(168, 237, 234, 0.8)',
+                        borderColor: 'rgba(168, 237, 234, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // --- 7. Word Cloud (Compatible avec votre endpoint) ---
+        async function loadWordCloud() {
+            try {
+                console.log('🔍 Chargement des mots-clés...');
+                const res = await fetch(`${API_URL}/stats/keywords`);
+                const json = await res.json();
+                
+                console.log('📊 Keywords reçus:', json);
+
+                if (!json.data || json.data.length === 0) {
+                    document.getElementById('wordCloudContainer').innerHTML = 
+                        '<div class="alert alert-info"><i class="fas fa-info-circle me-2"></i>Aucun mot-clé disponible pour le moment</div>';
+                    return;
+                }
+
+                // Compatible avec les deux formats: {name, weight} OU {word, weight}
+                const words = json.data.map(item => ({
+                    text: item.name || item.word || 'N/A',
+                    size: Math.max((item.weight || item.count || 10) * 2, 12) // Taille min 12px
+                }));
+
+                console.log('✅ Mots transformés:', words.length);
+
+                const width = document.getElementById('wordCloudContainer').offsetWidth || 800;
+                const height = 450;
+
+                const layout = d3.layout.cloud()
+                    .size([width, height])
+                    .words(words)
+                    .padding(10)
+                    .rotate(() => {
+                        // Rotation aléatoire: 0°, 45°, -45°, 90°, -90°
+                        const rotations = [0, 45, -45, 90, -90];
+                        return rotations[Math.floor(Math.random() * rotations.length)];
+                    })
+                    .fontSize(d => d.size)
+                    .on('end', draw);
+
+                layout.start();
+
+                function draw(words) {
+                    // Palette de couleurs personnalisée
+                    const colorScale = d3.scaleOrdinal()
+                        .domain(words.map(d => d.text))
+                        .range([
+                            '#667eea', '#764ba2', '#f093fb', '#f5576c', 
+                            '#4facfe', '#00f2fe', '#fa709a', '#fee140',
+                            '#30cfd0', '#330867', '#a8edea', '#fed6e3'
+                        ]);
+
+                    // Nettoyer le conteneur
+                    d3.select('#wordCloudContainer').html('');
+                    
+                    // Créer le SVG
+                    const svg = d3.select('#wordCloudContainer')
+                        .append('svg')
+                        .attr('width', width)
+                        .attr('height', height)
+                        .style('background', 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 30%, #ffecd2 100%)')
+                        .style('border-radius', '12px');
+
+                    const g = svg.append('g')
+                        .attr('transform', `translate(${width/2},${height/2})`);
+
+                    // Ajouter les mots
+                    g.selectAll('text')
+                        .data(words)
+                        .enter()
+                        .append('text')
+                        .style('font-size', d => `${d.size}px`)
+                        .style('font-family', 'Impact, Arial Black, sans-serif')
+                        .style('font-weight', 'bold')
+                        .style('fill', d => colorScale(d.text))
+                        .style('cursor', 'pointer')
+                        .style('text-shadow', '2px 2px 4px rgba(0,0,0,0.1)')
+                        .attr('text-anchor', 'middle')
+                        .attr('transform', d => `translate(${d.x},${d.y}) rotate(${d.rotate})`)
+                        .text(d => d.text)
+                        .on('mouseover', function(event, d) {
+                            d3.select(this)
+                                .transition()
+                                .duration(200)
+                                .style('font-size', `${d.size * 1.3}px`)
+                                .style('fill', '#ff6b6b')
+                                .style('text-shadow', '3px 3px 8px rgba(0,0,0,0.3)');
+                        })
+                        .on('mouseout', function(event, d) {
+                            d3.select(this)
+                                .transition()
+                                .duration(200)
+                                .style('font-size', `${d.size}px`)
+                                .style('fill', colorScale(d.text))
+                                .style('text-shadow', '2px 2px 4px rgba(0,0,0,0.1)');
+                        })
+                        .on('click', function(event, d) {
+                            // Rechercher le mot cliqué
+                            document.getElementById('searchInput').value = d.text;
+                            searchArticles();
+                            // Scroll vers la section de recherche
+                            document.getElementById('searchInput').scrollIntoView({ behavior: 'smooth' });
+                        });
+
+                    console.log('✅ Word Cloud généré avec', words.length, 'mots');
+                }
+            } catch (error) {
+                console.error('❌ Erreur Word Cloud:', error);
+                document.getElementById('wordCloudContainer').innerHTML = 
+                    `<div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Erreur de chargement du nuage de mots: ${error.message}
+                    </div>`;
+            }
+        }
+
+        // --- 8. Search Engine ---
+        async function searchArticles() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+
+            try {
+                const res = await fetch(`${API_URL}/search?query=${encodeURIComponent(query)}`);
+                const results = await res.json();
+                
+                const tbody = document.querySelector('#resultsTable tbody');
+                tbody.innerHTML = '';
+
+                if (results.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center text-white-50">
+                                <i class="fas fa-search me-2"></i>Aucun résultat trouvé pour "${query}"
+                            </td>
+                        </tr>`;
+                    return;
+                }
+
+                results.forEach(item => {
+                    const row = `
+                        <tr>
+                            <td><strong>${item.title || 'N/A'}</strong></td>
+                            <td>${item.authors || 'Inconnu'}</td>
+                            <td><span class="badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">${item.date_pub || 'N/A'}</span></td>
+                            <td>${item.source || 'N/A'}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error('Erreur recherche:', error);
+                alert('Erreur lors de la recherche');
+            }
+        }
+
+        // Allow search on Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchArticles();
+        });
+    </script>
+</body>
+</html>
